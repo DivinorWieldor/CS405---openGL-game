@@ -23,10 +23,10 @@ const char* vertexShaderSource =
 const char* fragmentShaderSource =
 "#version 330 core\n"
 "out vec4 FragColor;\n"
-"in vec4 vertexColor;\n"
+"uniform vec4 ourColor;\n" //for attribute that changes every frame
 "void main()\n"
 "{\n"
-"   FragColor = vertexColor;\n"
+"   FragColor = ourColor;\n"
 "}\n\0";
 
 int main(){
@@ -127,7 +127,8 @@ int main(){
 
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    glBindVertexArray(0);
+    //glBindVertexArray(0);
+    glBindVertexArray(VAO);
 
     // uncomment this call to draw in wireframe polygons.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -142,9 +143,19 @@ int main(){
 
         // draw our first triangle
         glUseProgram(shaderProgram);
-        glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+
+        // update shader uniform
+        double  timeValue = glfwGetTime();
+        float greenValue = static_cast<float>(sin(timeValue) / 2.0 + 0.5);
+        float redValue = static_cast<float>(cos(timeValue) / 2.0 + 0.5);
+        float blueValue = static_cast<float>(sin(timeValue-1.5) / 2.0 + 0.5);
+        int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+        glUniform4f(vertexColorLocation, redValue, greenValue, blueValue, 1.0f);
+
+        //render the triangle
+        glBindVertexArray(VAO);
         //glDrawArrays(GL_TRIANGLES, 0, 6);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); 
         // glBindVertexArray(0); // no need to unbind it every time 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
