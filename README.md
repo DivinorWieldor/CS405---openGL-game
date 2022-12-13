@@ -3,6 +3,7 @@
 
 ##Resources used:
 	https://learnopengl.com/Getting-started/Hello-Window
+	https://github.com/JoeyDeVries/Cell -> mesh classes
 	
 ##External Dependencies:
 	glad
