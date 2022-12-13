@@ -1,6 +1,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <iostream>
 #include "shader_s.h"
 #include "stb_image.h"
@@ -49,12 +53,6 @@ int main(){
     unsigned int indices[] = {  // note that we start from 0!
         0, 1, 3,  // first Triangle
         1, 2, 3   // second Triangle
-    };
-    float texCoords[] = {
-    0.0f, 0.0f, //bottom left
-    0.0f, 1.0f, //top left
-    1.0f, 0.0f, //bottom right
-    1.0f, 1.0f  //top right
     };
 
     unsigned int VBO, VAO, EBO;
@@ -125,15 +123,16 @@ int main(){
     // load and generate the texture
     data = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
     if (data) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else std::cout << "Failed to load texture 2" << std::endl;
     stbi_image_free(data);
 
     ourShader.use(); // don't forget to activate the shader before setting uniforms!  
-    glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0); // set it manually
-    ourShader.setInt("texture2", 1); // or with shader class
+    //glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0); // set it manually
+    ourShader.setInt("texture1", 0);// or with shader class
+    ourShader.setInt("texture2", 1);
 
     // render loop
     while(!glfwWindowShouldClose(window)){
@@ -148,8 +147,18 @@ int main(){
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
+
+        // create transformations
+        glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+        transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        // get matrix's uniform location and set matrix
         ourShader.use();
-        glBindVertexArray(VAO);
+        unsigned int transformLoc = glGetUniformLocation(ourShader.ID, "transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+
+        glBindVertexArray(VAO);//render container
         //glDrawArrays(GL_TRIANGLES, 0, 6);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 

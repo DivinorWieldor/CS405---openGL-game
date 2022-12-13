@@ -1,0 +1,35 @@
+﻿original vector v = x
+					y
+					z
+					w
+
+Scaling:
+S1 0  0  0		x
+0  S2 0  0		y
+0  0  S3 0	*	z
+0  0  0  1		1
+
+Translation:
+0  0  0  S1		x
+0  0  0  S2		y
+0  0  0  S3	*	z
+0  0  0  1		1
+
+Rotation: (this method causes gimbal lock)
+	Around X axis:
+	0  0     0     0		x
+	0  cosθ -sinθ  0		y
+	0  sinθ  cosθ  0	*	z
+	0  0     0     1		1
+
+	Around Y axis:
+	cosθ  0  sinθ  0		x
+	0     1  0     0		y
+	-sinθ 0  cosθ  0	*	z
+	0     0  0     1		1
+
+	Around Z axis:
+	cosθ -sinθ  0  0		x
+	sinθ  cosθ  0  0		y
+	0     0     1  0	*	z
+	0     0     0  1		1
