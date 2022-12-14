@@ -140,15 +140,15 @@ int main(){
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);//vertex array object
     glGenBuffers(1, &VBO);//vertex buffer object
-    glGenBuffers(1, &EBO);//element buffer object - allows vertex overlap (without it you have to define overlapping vertices seperately)
+    //glGenBuffers(1, &EBO);//element buffer object - allows vertex overlap (without it you have to define overlapping vertices seperately)
     // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);//copy user defined data to bound buffer
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
@@ -219,10 +219,10 @@ int main(){
     else std::cout << "Failed to load texture 2" << std::endl;
     stbi_image_free(data);
 
-    ourShader.use(); // don't forget to activate the shader before setting uniforms!  
-    //glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0); // set it manually
-    ourShader.setInt("texture1", 0);// or with shader class
-    ourShader.setInt("texture2", 1);
+    //ourShader.use(); // don't forget to activate the shader before setting uniforms!  
+    ////glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0); // set it manually
+    //ourShader.setInt("texture1", 0);// or with shader class
+    //ourShader.setInt("texture2", 1);
 
     glfwSetCursorPos(window, lastX, lastY);//avoids cursor jump at program start
     // render loop
@@ -241,6 +241,7 @@ int main(){
         lightShader.use();
         lightShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
         lightShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        lightShader.setVec3("lightPos", lightPos);
 
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -305,7 +306,7 @@ int main(){
     // optional: de-allocate all resources once they've outlived their purpose:
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
+    //glDeleteBuffers(1, &EBO);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     glfwTerminate();
