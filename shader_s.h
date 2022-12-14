@@ -120,9 +120,9 @@ class Shader {
 
     private:
         // utility function for checking shader compilation/linking errors
-        void checkCompileErrors(unsigned int shader, std::string type){
-            int success;
-            char infoLog[1024];
+        void checkCompileErrors(GLuint shader, std::string type){
+            GLint success;
+            GLchar infoLog[1024];
 
             if (type != "PROGRAM"){
                 glGetShaderiv(shader, GL_COMPILE_STATUS, &success);

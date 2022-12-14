@@ -120,10 +120,10 @@ int main(){
         -0.5f,  0.5f,  0.5f,   0.0f, 1.0f, 1.0f,    0.0f, 0.0f,     0.0f,  1.0f,  0.0f,
         -0.5f,  0.5f, -0.5f,   1.0f, 0.0f, 1.0f,    0.0f, 1.0f,     0.0f,  1.0f,  0.0f
     };
-    unsigned int indices[] = {  // note that we start from 0!
-        0, 1, 3,  // first Triangle
-        1, 2, 3   // second Triangle
-    };
+    //unsigned int indices[] = {  // note that we start from 0!
+    //    0, 1, 3,  // first Triangle
+    //    1, 2, 3   // second Triangle
+    //};
     glm::vec3 cubePositions[] = {// world space positions of our cubes
         glm::vec3(0.0f,  0.0f,  0.0f),
         glm::vec3(2.0f,  5.0f, -15.0f),
@@ -141,11 +141,12 @@ int main(){
     glGenVertexArrays(1, &VAO);//vertex array object
     glGenBuffers(1, &VBO);//vertex buffer object
     //glGenBuffers(1, &EBO);//element buffer object - allows vertex overlap (without it you have to define overlapping vertices seperately)
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
+    
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);//copy user defined data to bound buffer
+
+    glBindVertexArray(VAO);
 
     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
@@ -159,12 +160,17 @@ int main(){
     // texture attribute
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
+    // normal attribute
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
+    glEnableVertexAttribArray(3);
 
-    //configure light's VAO
+    // second, configure light's VAO (VBO stays same, vertices are the same for the light object)
     unsigned int lightVAO;
     glGenVertexArrays(1, &lightVAO);
     glBindVertexArray(lightVAO);
 
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    //belongs to the white cube (lamp)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
@@ -219,10 +225,10 @@ int main(){
     else std::cout << "Failed to load texture 2" << std::endl;
     stbi_image_free(data);
 
-    //ourShader.use(); // don't forget to activate the shader before setting uniforms!  
-    ////glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0); // set it manually
-    //ourShader.setInt("texture1", 0);// or with shader class
-    //ourShader.setInt("texture2", 1);
+    ourShader.use(); // don't forget to activate the shader before setting uniforms!  
+    //glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0); // set it manually
+    ourShader.setInt("texture1", 0);// or with shader class
+    ourShader.setInt("texture2", 1);
 
     glfwSetCursorPos(window, lastX, lastY);//avoids cursor jump at program start
     // render loop
@@ -242,16 +248,21 @@ int main(){
         lightShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
         lightShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         lightShader.setVec3("lightPos", lightPos);
+        lightShader.setVec3("viewPos", camera.Position);
 
-        // view/projection transformations
+        // projection transformation
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         lightShader.setMat4("projection", projection);
+
+        // camera/view transformation
+        glm::mat4 view = camera.GetViewMatrix();
+        lightShader.setMat4("view", view);
 
         // world transformation
         glm::mat4 model = glm::mat4(1.0f);
         lightShader.setMat4("model", model);
 
-        //render the triangle
+        ////render the triangle
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
@@ -268,9 +279,7 @@ int main(){
         //glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         //ourShader.setMat4("projection", projection);
 
-        //// camera/view transformation
-        glm::mat4 view = camera.GetViewMatrix();
-        lightShader.setMat4("view", view);
+        
 
         glBindVertexArray(VAO);//render cubes
         for (unsigned int i = 0; i < 10; i++){// calculate model matrix for each object, pass it to shader
@@ -285,6 +294,10 @@ int main(){
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
         //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);//when doing a cube, only rendered a triangle
+
+        // render the cube
+        //glBindVertexArray(VAO);
+        //glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // also draw the lamp object
         lightCubeShader.use();
@@ -305,6 +318,7 @@ int main(){
 
     // optional: de-allocate all resources once they've outlived their purpose:
     glDeleteVertexArrays(1, &VAO);
+    glDeleteVertexArrays(1, &lightVAO);
     glDeleteBuffers(1, &VBO);
     //glDeleteBuffers(1, &EBO);
 

@@ -12,6 +12,7 @@
 ##Useful resources:
 	https://github.com/JoeyDeVries/Cell -> mesh classes
 	https://chanhaeng.blogspot.com/2018/09/quaternion-camera-implementation.html -> quaternion camera (for spaceship)
+	https://github.com/ocornut/imgui -> easy to implement runtime GUI
 	
 	
 	
