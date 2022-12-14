@@ -34,6 +34,8 @@ float lastFrame = 0.0f; // Time of last frame
 //light source
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
+glm::vec3 texturedPos(-1.2f, 1.0f, 2.0f);
+
 int main(){
     //initialize glfw and configure
     glfwInit();
@@ -174,6 +176,22 @@ int main(){
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+    unsigned int texturedVAO;
+    glGenVertexArrays(1, &texturedVAO);
+    glBindVertexArray(texturedVAO);
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    // texture attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    // normal attribute
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
+    glEnableVertexAttribArray(3);
+
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -273,14 +291,6 @@ int main(){
         transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
         transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 
-        //ourShader.use();//activate shader
-
-        //// pass projection matrix to shader
-        //glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        //ourShader.setMat4("projection", projection);
-
-        
-
         glBindVertexArray(VAO);//render cubes
         for (unsigned int i = 0; i < 10; i++){// calculate model matrix for each object, pass it to shader
             glm::mat4 model = glm::mat4(1.0f);
@@ -296,8 +306,8 @@ int main(){
         //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);//when doing a cube, only rendered a triangle
 
         // render the cube
-        //glBindVertexArray(VAO);
-        //glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // also draw the lamp object
         lightCubeShader.use();
@@ -309,6 +319,20 @@ int main(){
         lightCubeShader.setMat4("model", model);
 
         glBindVertexArray(lightVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        //textured cube
+        ourShader.use();//activate shader
+        // pass projection matrix to shader
+        //glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        ourShader.setMat4("projection", projection);
+        ourShader.setMat4("view", view);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, texturedPos);
+        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+        ourShader.setMat4("model", model);
+
+        glBindVertexArray(texturedVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
