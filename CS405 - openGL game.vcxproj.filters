@@ -24,6 +24,9 @@
     <ClCompile Include="Source1.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="chanCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shader_s.h">
@@ -32,12 +35,36 @@
     <ClInclude Include="stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FlyCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="chanCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="test.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="3.3.shader.vs">
+    <None Include="shader.vs">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="3.3.shader.fs">
+    <None Include="shader.fs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="lightingShader.fs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="lightingShader.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="lightCube.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="lightCube.fs">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

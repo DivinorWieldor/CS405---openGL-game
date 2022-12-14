@@ -146,16 +146,25 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
+    <ClCompile Include="chanCamera.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="Source1.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FlyCamera.h" />
+    <ClInclude Include="FreeCamera.h" />
+    <ClInclude Include="chanCamera.h" />
     <ClInclude Include="shader_s.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="test.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="3.3.shader.fs" />
-    <None Include="3.3.shader.vs" />
+    <None Include="lightCube.fs" />
+    <None Include="lightCube.vs" />
+    <None Include="lightingShader.fs" />
+    <None Include="lightingShader.vs" />
+    <None Include="shader.fs" />
+    <None Include="shader.vs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="awesomeface.png" />

@@ -1,1 +1,4 @@
-﻿  CS405 - openGL game.vcxproj -> C:\Users\necagiltay\source\repos\CS405 - OpenGL game\x64\Debug\CS405 - openGL game.exe
+﻿  Source.cpp
+C:\Users\necagiltay\source\repos\CS405 - OpenGL game\CS405 - openGL game\Source.cpp(233,28): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\necagiltay\source\repos\CS405 - OpenGL game\CS405 - openGL game\Source.cpp(280,39): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  CS405 - openGL game.vcxproj -> C:\Users\necagiltay\source\repos\CS405 - OpenGL game\x64\Debug\CS405 - openGL game.exe
