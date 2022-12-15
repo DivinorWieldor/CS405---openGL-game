@@ -14,6 +14,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
+unsigned int loadTexture(const char* path);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -206,42 +207,10 @@ int main(){
     // uncomment this call to draw in wireframe polygons.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    //texture loading process
-    unsigned int texture1, texture2;
-    //---------------------------texture 1---------------------------
-    glGenTextures(1, &texture1);//how many textures to generate, output variable
-    glBindTexture(GL_TEXTURE_2D, texture1);
-    //set texture wrapping/filtering options (on currently bound texture object)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load and generate the texture
-    int width, height, nrChannels;
-    stbi_set_flip_vertically_on_load(true);
-    unsigned char* data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
-    if (data) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else std::cout << "Failed to load texture 1" << std::endl;
-    stbi_image_free(data);
-    //---------------------------texture 2---------------------------
-    glGenTextures(1, &texture2);//how many textures to generate, output variable
-    glBindTexture(GL_TEXTURE_2D, texture2);
-    //set texture wrapping/filtering options (on currently bound texture object)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load and generate the texture
-    data = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
-    if (data) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else std::cout << "Failed to load texture 2" << std::endl;
-    stbi_image_free(data);
+    //load textures
+    unsigned int texture1 = loadTexture("container.jpg");
+    unsigned int texture2 = loadTexture("awesomeface.png");
+    unsigned int texture3 = loadTexture("matrix.jpg");
 
     ourShader.use(); // don't forget to activate the shader before setting uniforms!  
     //glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0); // set it manually
@@ -249,8 +218,10 @@ int main(){
     ourShader.setInt("texture2", 1);
 
     lightShader.use();
-    lightShader.setInt("material.specular", 1);
     lightShader.setInt("material.diffuse", 0);
+    lightShader.setInt("material.specular", 1);
+    lightShader.setInt("material.emission", 2);
+    
 
     glfwSetCursorPos(window, lastX, lastY);//avoids cursor jump at program start
     // render loop
@@ -294,11 +265,13 @@ int main(){
         glm::mat4 model = glm::mat4(1.0f);
         lightShader.setMat4("model", model);
 
-        ////render the triangle
+        //render the triangle
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
+        glBindTexture(GL_TEXTURE_2D, texture1);// bind diffuse map
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture2);
+        glBindTexture(GL_TEXTURE_2D, texture2);// bind specular map
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, texture3);// bind emission map
 
         // create transformations
         glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
@@ -381,14 +354,13 @@ void processInput(GLFWwindow* window){
         glfwSetWindowShouldClose(window, true);
 }
 
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
-void framebuffer_size_callback(GLFWwindow* window, int width, int height){
-    // make sure the viewport matches the new window dimensions; note that width and 
-    // height will be significantly larger than specified on retina displays.
+void framebuffer_size_callback(GLFWwindow* window, int width, int height){//whenever the window size changed (by OS or user resize)
+    // make sure viewport matches new window dimensions; note that width-height
+    //  will be significantly larger than specified on retina displays
     glViewport(0, 0, width, height);
 }
 
-void mouse_callback(GLFWwindow* window, double xposIn, double yposIn){
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn){//whenever the mouse moves
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 
@@ -405,6 +377,36 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn){
 
     camera.ProcessMouseMovement(xoffset, yoffset);
 }
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){//whenever the mouse scroll wheel scrolls
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
+}
+
+unsigned int loadTexture(char const* path){
+    unsigned int textureID;
+    int width, height, nrComponents;
+    unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
+    glGenTextures(1, &textureID);
+
+    if(data){
+        GLenum format;
+        if (nrComponents == 1)      format = GL_RED;
+        else if (nrComponents == 3) format = GL_RGB;
+        else if (nrComponents == 4) format = GL_RGBA;
+
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }
+    else{
+        std::cout << "Texture failed to load. Texture path: " << path << std::endl;
+        stbi_image_free(data);
+    }
+    return textureID;
 }

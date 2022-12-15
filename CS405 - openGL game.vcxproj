@@ -169,6 +169,7 @@
   <ItemGroup>
     <Image Include="awesomeface.png" />
     <Image Include="container.jpg" />
+    <Image Include="matrix.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="transformation_notes.txt" />

@@ -75,6 +75,9 @@
     <Image Include="awesomeface.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="matrix.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="transformation_notes.txt">
