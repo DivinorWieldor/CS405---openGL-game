@@ -67,6 +67,12 @@
     <None Include="lightCube.fs">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="reflective2.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="reflective2.fs">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="container.jpg">

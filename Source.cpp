@@ -55,17 +55,20 @@ int main(){
     // build and compile our shader program
     Shader ourShader("nReflectiveShader.vs", "nReflectiveShader.fs");
     Shader reflectShader("reflectiveShader.vs", "reflectiveShader.fs");
+    Shader flatShader("reflective2.vs", "reflective2.fs");
     Shader lightCubeShader("lightCube.vs", "lightCube.fs");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
-    //float vertices[] = {//plane
-    //    //positions            //colors             //texture coords
-    //     0.5f,  0.5f, 0.0f,    1.0f, 0.0f, 0.0f,    1.0f, 1.0f, // top right
-    //     0.5f, -0.5f, 0.0f,    0.0f, 1.0f, 0.0f,    1.0f, 0.0f, // bottom right
-    //    -0.5f, -0.5f, 0.0f,    0.0f, 0.0f, 1.0f,    0.0f, 0.0f, // bottom left
-    //    -0.5f,  0.5f, 0.0f,    1.0f, 1.0f, 0.0f,    0.0f, 1.0f  // top left 
-    //};
-    float vertices[] = {//cube
+    float planeVertices[] = {//plane
+        //positions           //colors             //texture coords    //normals
+        -20.5f, -3.5f, -20.5f,   1.0f, 0.0f, 0.0f,    0.0f, 1.0f,     0.0f, -1.0f,  0.0f,// bottom left
+         20.5f, -3.5f, -20.5f,   0.0f, 1.0f, 0.0f,    1.0f, 1.0f,     0.0f, -1.0f,  0.0f,// top left 
+         20.5f, -3.5f,  20.5f,   0.0f, 0.0f, 1.0f,    1.0f, 0.0f,     0.0f, -1.0f,  0.0f,// top right
+         20.5f, -3.5f,  20.5f,   1.0f, 1.0f, 0.0f,    1.0f, 0.0f,     0.0f, -1.0f,  0.0f,
+        -20.5f, -3.5f,  20.5f,   0.0f, 1.0f, 1.0f,    0.0f, 0.0f,     0.0f, -1.0f,  0.0f,// bottom right
+        -20.5f, -3.5f, -20.5f,   1.0f, 0.0f, 1.0f,    0.0f, 1.0f,     0.0f, -1.0f,  0.0f
+    };
+    float cubeVertices[] = {//cube
         //positions           //colors             //texture coords //normals
         -0.5f, -0.5f, -0.5f,   1.0f, 0.0f, 0.0f,    0.0f, 0.0f,     0.0f,  0.0f, -1.0f,
          0.5f, -0.5f, -0.5f,   0.0f, 1.0f, 0.0f,    1.0f, 0.0f,     0.0f,  0.0f, -1.0f,
@@ -94,14 +97,14 @@ int main(){
          0.5f, -0.5f, -0.5f,   1.0f, 1.0f, 0.0f,    0.0f, 1.0f,     1.0f,  0.0f,  0.0f,
          0.5f, -0.5f,  0.5f,   0.0f, 1.0f, 1.0f,    0.0f, 0.0f,     1.0f,  0.0f,  0.0f,
          0.5f,  0.5f,  0.5f,   1.0f, 0.0f, 1.0f,    1.0f, 0.0f,     1.0f,  0.0f,  0.0f,
-
+         //bottom
         -0.5f, -0.5f, -0.5f,   1.0f, 0.0f, 0.0f,    0.0f, 1.0f,     0.0f, -1.0f,  0.0f,
          0.5f, -0.5f, -0.5f,   0.0f, 1.0f, 0.0f,    1.0f, 1.0f,     0.0f, -1.0f,  0.0f,
          0.5f, -0.5f,  0.5f,   0.0f, 0.0f, 1.0f,    1.0f, 0.0f,     0.0f, -1.0f,  0.0f,
          0.5f, -0.5f,  0.5f,   1.0f, 1.0f, 0.0f,    1.0f, 0.0f,     0.0f, -1.0f,  0.0f,
         -0.5f, -0.5f,  0.5f,   0.0f, 1.0f, 1.0f,    0.0f, 0.0f,     0.0f, -1.0f,  0.0f,
         -0.5f, -0.5f, -0.5f,   1.0f, 0.0f, 1.0f,    0.0f, 1.0f,     0.0f, -1.0f,  0.0f,
-
+        //top
         -0.5f,  0.5f, -0.5f,   1.0f, 0.0f, 0.0f,    0.0f, 1.0f,     0.0f,  1.0f,  0.0f,
          0.5f,  0.5f, -0.5f,   0.0f, 1.0f, 0.0f,    1.0f, 1.0f,     0.0f,  1.0f,  0.0f,
          0.5f,  0.5f,  0.5f,   0.0f, 0.0f, 1.0f,    1.0f, 0.0f,     0.0f,  1.0f,  0.0f,
@@ -126,14 +129,13 @@ int main(){
         glm::vec3(-1.3f,  1.0f, -1.5f)
     };
 
-    unsigned int VBO, VAO, EBO;
+    unsigned int cubeVBO, VAO;
     glGenVertexArrays(1, &VAO);//vertex array object
-    glGenBuffers(1, &VBO);//vertex buffer object
+    glGenBuffers(1, &cubeVBO);//vertex buffer object
     //glGenBuffers(1, &EBO);//element buffer object - allows vertex overlap (without it you have to define overlapping vertices seperately)
     
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);//copy user defined data to bound buffer
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);//copy user defined data to bound buffer
 
     glBindVertexArray(VAO);
 
@@ -158,7 +160,7 @@ int main(){
     glGenVertexArrays(1, &lightVAO);
     glBindVertexArray(lightVAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
     //belongs to the white cube (lamp)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -166,6 +168,27 @@ int main(){
     unsigned int texturedVAO;
     glGenVertexArrays(1, &texturedVAO);
     glBindVertexArray(texturedVAO);
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    // texture attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    // normal attribute
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
+    glEnableVertexAttribArray(3);
+
+    //plane
+    unsigned int PlaneVBO;
+    glGenBuffers(1, &PlaneVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, PlaneVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);//copy user defined data to bound buffer
+    unsigned int planeVAO;
+    glGenVertexArrays(1, &planeVAO);
+    glBindVertexArray(planeVAO);
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -273,10 +296,6 @@ int main(){
         }
         //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);//when doing a cube, only rendered a triangle
 
-        // render the cube
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-
         // also draw the lamp object
         lightCubeShader.use();
         lightCubeShader.setMat4("projection", projection);
@@ -303,15 +322,38 @@ int main(){
         glBindVertexArray(texturedVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
+        //floor plane
+        flatShader.use();//activate shader
+        flatShader.setVec3("viewPos", camera.Position);
+        flatShader.setVec3("light.position", lightPos);
+
+        flatShader.setVec3("light.ambient", 0.2f, 0.5f, 0.31f);
+        flatShader.setVec3("light.diffuse", 0.2f, 0.5f, 0.31f);
+        flatShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+        flatShader.setFloat("material.shininess", 32.0f);
+        flatShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+        flatShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+        flatShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        flatShader.setMat4("projection", projection);
+        flatShader.setMat4("view", view);
+        model = glm::mat4(1.0f);
+        flatShader.setMat4("model", model);
+
+        glBindVertexArray(planeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    // optional: de-allocate all resources once they've outlived their purpose:
+    //de-allocate resources:
     glDeleteVertexArrays(1, &VAO);
+    glDeleteVertexArrays(1, &planeVAO);
     glDeleteVertexArrays(1, &lightVAO);
-    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &cubeVBO);
+    glDeleteBuffers(1, &PlaneVBO);
     //glDeleteBuffers(1, &EBO);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
@@ -372,7 +414,8 @@ unsigned int loadTexture(char const* path){
         GLenum format;
         if (nrComponents == 1)      format = GL_RED;
         else if (nrComponents == 3) format = GL_RGB;
-        else if (nrComponents == 4) format = GL_RGBA;
+        else format = GL_RGBA;//else if (nrComponents == 4) format = GL_RGBA;
+        
 
         glBindTexture(GL_TEXTURE_2D, textureID);
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
@@ -409,8 +452,8 @@ void glfwConfigureWindow(GLFWwindow* window){// glfw window creation
 bool gladSetup(){// glad: load OpenGL function pointers
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
         std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
+        return false;
     }
     glEnable(GL_DEPTH_TEST);//enable depth buffer
-    return 1;
+    return true;
 }

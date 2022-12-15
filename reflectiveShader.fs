@@ -1,5 +1,4 @@
 #version 330 core
-
 struct Material {
     sampler2D specular;//reflection intensity + texture Of Object
     float shininess;//metalicity
@@ -9,7 +8,9 @@ struct Material {
 uniform Material material;
 
 struct Light {
-    vec3 position;//position of the light
+    //position of the light
+    vec3 position;//used for point light/spotlight
+    //vec3 direction;//used for directional lights(sun in the sky etc)
 
     vec3 ambient;//generally set to a low value
     vec3 diffuse;//exact color we want light to have (often bright white)
@@ -30,8 +31,9 @@ void main(){
     vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
   	
     // diffuse 
+    vec3 lightDir = normalize(light.position - FragPos);//point light/spotlight
+    //vec3 lightDir = normalize(-light.direction);//directional light
     vec3 norm = normalize(Normal);
-    vec3 lightDir = normalize(light.position - FragPos);
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords)); 
 

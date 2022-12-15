@@ -161,6 +161,8 @@
   <ItemGroup>
     <None Include="lightCube.fs" />
     <None Include="lightCube.vs" />
+    <None Include="reflective2.fs" />
+    <None Include="reflective2.vs" />
     <None Include="reflectiveShader.fs" />
     <None Include="reflectiveShader.vs" />
     <None Include="nReflectiveShader.fs" />
