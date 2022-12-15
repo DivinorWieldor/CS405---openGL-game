@@ -49,16 +49,16 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader.vs">
+    <None Include="nReflectiveShader.vs">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="shader.fs">
+    <None Include="nReflectiveShader.fs">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="lightingShader.fs">
+    <None Include="reflectiveShader.fs">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="lightingShader.vs">
+    <None Include="reflectiveShader.vs">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="lightCube.vs">

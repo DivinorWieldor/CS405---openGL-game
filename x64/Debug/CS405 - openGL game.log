@@ -1,20 +1,21 @@
 ﻿  Source.cpp
-C:\Users\necagiltay\source\repos\CS405 - OpenGL game\CS405 - openGL game\Source.cpp(232,28): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\necagiltay\source\repos\CS405 - OpenGL game\CS405 - openGL game\Source.cpp(241,27): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
+C:\Users\necagiltay\source\repos\CS405 - OpenGL game\CS405 - openGL game\Source.cpp(213,28): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\necagiltay\source\repos\CS405 - OpenGL game\CS405 - openGL game\Source.cpp(222,27): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\necagiltay\source\repos\CS405 - OpenGL game\CS405 - openGL game\Source.cpp(242,27): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
+C:\Users\necagiltay\source\repos\CS405 - OpenGL game\CS405 - openGL game\Source.cpp(223,27): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\necagiltay\source\repos\CS405 - OpenGL game\CS405 - openGL game\Source.cpp(243,27): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
+C:\Users\necagiltay\source\repos\CS405 - OpenGL game\CS405 - openGL game\Source.cpp(224,27): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\necagiltay\source\repos\CS405 - OpenGL game\CS405 - openGL game\Source.cpp(287,39): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\necagiltay\source\repos\CS405 - OpenGL game\CS405 - openGL game\Source.cpp(143,28): warning C4101: 'EBO': unreferenced local variable
+C:\Users\necagiltay\source\repos\CS405 - OpenGL game\CS405 - openGL game\Source.cpp(268,39): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\necagiltay\source\repos\CS405 - OpenGL game\CS405 - openGL game\Source.cpp(129,28): warning C4101: 'EBO': unreferenced local variable
+C:\Users\necagiltay\source\repos\CS405 - OpenGL game\CS405 - openGL game\Source.cpp(412,18): warning C4305: 'return': truncation from 'int' to 'bool'
   CS405 - openGL game.vcxproj -> C:\Users\necagiltay\source\repos\CS405 - OpenGL game\x64\Debug\CS405 - openGL game.exe

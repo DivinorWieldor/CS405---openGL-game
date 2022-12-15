@@ -1,10 +1,10 @@
 #version 330 core
 
 struct Material {
-    sampler2D specular;//reflection intensity + texture of the object
+    sampler2D specular;//reflection intensity + texture Of Object
     float shininess;//metalicity
-    sampler2D  diffuse;//color + texture of the object
-    sampler2D  emission;//color + texture of the object
+    sampler2D  diffuse;//color + texture Of Object
+    sampler2D  emission;//color + texture Of Object
 }; 
 uniform Material material;
 

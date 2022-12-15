@@ -13,13 +13,18 @@
 	https://github.com/JoeyDeVries/Cell -> mesh classes
 	https://chanhaeng.blogspot.com/2018/09/quaternion-camera-implementation.html -> quaternion camera (for spaceship)
 	https://github.com/ocornut/imgui -> easy to implement runtime GUI
+	https://en.wikibooks.org/wiki/GLSL_Programming/Unity/Cookies -> light cookies (masking)
 	
 	
 	
+##Shortcomings and issues:
+	limited depth perception -> add a "floor"
+	can't see if light works properly -> add object without texture
+	how does the current scene relate to the final project? -> tangentially it does, it is supposed to be in space (0 gravity)
+		Current scene is made to test if capabilities of engine are working correctly. Goal was not to work towards game as of yet
+	models cannot be loaded easily from outside files, must be done within source.cpp
 
-
-
-##Free Camera:
+##Free Camera: (unused)
 can turn freely without quaternions
 source: http://disq.us/p/1ddwy5t (Laurie Bradshaw)
 	class camera{

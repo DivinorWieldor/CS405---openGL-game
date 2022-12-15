@@ -15,6 +15,9 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 unsigned int loadTexture(const char* path);
+void glfwSetup();
+void glfwConfigureWindow(GLFWwindow* window);
+bool gladSetup();
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -38,37 +41,20 @@ glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 glm::vec3 texturedPos(-1.2f, 1.0f, 2.0f);
 
 int main(){
-    //initialize glfw and configure
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwSetup();
 
-    // glfw window creation
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
     if(window == NULL){
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
     }
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetScrollCallback(window, scroll_callback);
-
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);// tell GLFW to capture our mouse
-
-    // glad: load OpenGL function pointers
-    if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }
-
-    glEnable(GL_DEPTH_TEST);//enable depth buffer
+    glfwConfigureWindow(window);
+    if(!gladSetup()) return -1;
 
     // build and compile our shader program
-    Shader ourShader("shader.vs", "shader.fs");
-    Shader lightShader("lightingShader.vs", "lightingShader.fs");
+    Shader ourShader("nReflectiveShader.vs", "nReflectiveShader.fs");
+    Shader reflectShader("reflectiveShader.vs", "reflectiveShader.fs");
     Shader lightCubeShader("lightCube.vs", "lightCube.fs");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -199,11 +185,6 @@ int main(){
     // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    //glBindVertexArray(0);
-    glBindVertexArray(VAO);
-
     // uncomment this call to draw in wireframe polygons.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -217,10 +198,10 @@ int main(){
     ourShader.setInt("texture1", 0);// or with shader class
     ourShader.setInt("texture2", 1);
 
-    lightShader.use();
-    lightShader.setInt("material.diffuse", 0);
-    lightShader.setInt("material.specular", 1);
-    lightShader.setInt("material.emission", 2);
+    reflectShader.use();
+    reflectShader.setInt("material.diffuse", 0);
+    reflectShader.setInt("material.specular", 1);
+    reflectShader.setInt("material.emission", 2);
     
 
     glfwSetCursorPos(window, lastX, lastY);//avoids cursor jump at program start
@@ -245,25 +226,25 @@ int main(){
         glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
         glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
 
-        lightShader.use();
-        lightShader.setVec3("viewPos", camera.Position);
-        lightShader.setVec3("light.position", lightPos);
-        lightShader.setVec3("light.ambient", ambientColor);
-        lightShader.setVec3("light.diffuse", diffuseColor);
-        lightShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        lightShader.setFloat("material.shininess", 32.0f);
+        reflectShader.use();
+        reflectShader.setVec3("viewPos", camera.Position);
+        reflectShader.setVec3("light.position", lightPos);
+        reflectShader.setVec3("light.ambient", ambientColor);
+        reflectShader.setVec3("light.diffuse", diffuseColor);
+        reflectShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        reflectShader.setFloat("material.shininess", 32.0f);
 
         // projection transformation
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        lightShader.setMat4("projection", projection);
+        reflectShader.setMat4("projection", projection);
 
         // camera/view transformation
         glm::mat4 view = camera.GetViewMatrix();
-        lightShader.setMat4("view", view);
+        reflectShader.setMat4("view", view);
 
         // world transformation
         glm::mat4 model = glm::mat4(1.0f);
-        lightShader.setMat4("model", model);
+        reflectShader.setMat4("model", model);
 
         //render the triangle
         glActiveTexture(GL_TEXTURE0);
@@ -286,7 +267,7 @@ int main(){
             if (i % 3 == 0)  //every 3rd cube, we set the angle using time function
                 angle = glfwGetTime() * 25.0f;
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            lightShader.setMat4("model", model);
+            reflectShader.setMat4("model", model);
 
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
@@ -409,4 +390,27 @@ unsigned int loadTexture(char const* path){
         stbi_image_free(data);
     }
     return textureID;
+}
+
+void glfwSetup(){//initialize glfw and configure
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+}
+void glfwConfigureWindow(GLFWwindow* window){// glfw window creation
+    glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);// tell GLFW to capture our mouse
+}
+bool gladSetup(){// glad: load OpenGL function pointers
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }
+    glEnable(GL_DEPTH_TEST);//enable depth buffer
+    return 1;
 }

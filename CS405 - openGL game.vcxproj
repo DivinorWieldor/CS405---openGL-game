@@ -161,10 +161,10 @@
   <ItemGroup>
     <None Include="lightCube.fs" />
     <None Include="lightCube.vs" />
-    <None Include="lightingShader.fs" />
-    <None Include="lightingShader.vs" />
-    <None Include="shader.fs" />
-    <None Include="shader.vs" />
+    <None Include="reflectiveShader.fs" />
+    <None Include="reflectiveShader.vs" />
+    <None Include="nReflectiveShader.fs" />
+    <None Include="nReflectiveShader.vs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="awesomeface.png" />
