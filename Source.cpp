@@ -248,6 +248,10 @@ int main(){
     ourShader.setInt("texture1", 0);// or with shader class
     ourShader.setInt("texture2", 1);
 
+    lightShader.use();
+    lightShader.setInt("material.specular", 1);
+    lightShader.setInt("material.diffuse", 0);
+
     glfwSetCursorPos(window, lastX, lastY);//avoids cursor jump at program start
     // render loop
     while(!glfwWindowShouldClose(window)){
@@ -276,10 +280,7 @@ int main(){
         lightShader.setVec3("light.ambient", ambientColor);
         lightShader.setVec3("light.diffuse", diffuseColor);
         lightShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        lightShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
-        lightShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
         lightShader.setFloat("material.shininess", 32.0f);
-        lightShader.setInt("material.diffuse", 1);
 
         // projection transformation
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
