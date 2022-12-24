@@ -225,7 +225,19 @@ int main(){
     reflectShader.setInt("material.diffuse", 0);
     reflectShader.setInt("material.specular", 1);
     reflectShader.setInt("material.emission", 2);
+
+    //render the triangle - can be outside as long as it doesn't exceed texture limit
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture1);// bind diffuse map
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture2);// bind specular map
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, texture3);// bind emission map
     
+    // world,        camera/view, screen projection transformations
+    glm::mat4 model, view, projection, transform;
+    glm::vec3 lightColor, diffuseColor, ambientColor;
+    float currentFrame;
 
     glfwSetCursorPos(window, lastX, lastY);//avoids cursor jump at program start
     // render loop
@@ -233,21 +245,21 @@ int main(){
         processInput(window);// input
 
         //per-frame time calculation
-        float currentFrame = glfwGetTime();
+        currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
         // render
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//clear color and depth buffer
+        //glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
-        glm::vec3 lightColor;
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//clear color and depth buffer
+        
         lightColor.x = sin(glfwGetTime() * 2.0f);
         lightColor.y = sin(glfwGetTime() * 0.7f);
         lightColor.z = sin(glfwGetTime() * 1.3f);
 
-        glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
-        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+        diffuseColor = lightColor * glm::vec3(0.5f);
+        ambientColor = diffuseColor * glm::vec3(0.2f);
 
         reflectShader.use();
         reflectShader.setVec3("viewPos", camera.Position);
@@ -258,28 +270,15 @@ int main(){
         reflectShader.setFloat("material.shininess", 32.0f);
 
         // projection transformation
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 500.0f);
         reflectShader.setMat4("projection", projection);
 
         // camera/view transformation
-        glm::mat4 view = camera.GetViewMatrix();
+        view = camera.GetViewMatrix();
         reflectShader.setMat4("view", view);
 
-        // world transformation
-        glm::mat4 model = glm::mat4(1.0f);
-        reflectShader.setMat4("model", model);
-
-        //render the triangle
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);// bind diffuse map
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture2);// bind specular map
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, texture3);// bind emission map
-
-        // create transformations
-        glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-        transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+        // create transformations - make sure to initialize matrix to identity matrix first
+        transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, -0.5f, 0.0f));
         transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 
         glBindVertexArray(VAO);//render cubes
@@ -310,8 +309,6 @@ int main(){
 
         //textured cube
         ourShader.use();//activate shader
-        // pass projection matrix to shader
-        //glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
         model = glm::mat4(1.0f);

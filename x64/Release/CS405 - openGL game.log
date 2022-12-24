@@ -1,0 +1,27 @@
+﻿  glad.c
+  chanCamera.cpp
+  Source.cpp
+C:\Users\necagiltay\source\repos\CS405 - OpenGL game\CS405 - openGL game\Source.cpp(248,35): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\necagiltay\source\repos\CS405 - OpenGL game\CS405 - openGL game\Source.cpp(257,27): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\necagiltay\source\repos\CS405 - OpenGL game\CS405 - openGL game\Source.cpp(258,27): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\necagiltay\source\repos\CS405 - OpenGL game\CS405 - openGL game\Source.cpp(259,27): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\necagiltay\source\repos\CS405 - OpenGL game\CS405 - openGL game\Source.cpp(290,39): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  Source1.cpp
+  Previous IPDB not found, fall back to full compilation.
+LINK : warning LNK4098: defaultlib 'MSVCRTD' conflicts with use of other libs; use /NODEFAULTLIB:library
+  Generating code
+  All 463 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  CS405 - openGL game.vcxproj -> C:\Users\necagiltay\source\repos\CS405 - OpenGL game\x64\Release\CS405 - openGL game.exe
