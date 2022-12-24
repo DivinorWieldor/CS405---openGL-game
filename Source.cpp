@@ -225,6 +225,9 @@ int main(){
     reflectShader.setInt("material.diffuse", 0);
     reflectShader.setInt("material.specular", 1);
     reflectShader.setInt("material.emission", 2);
+    reflectShader.setFloat("light.constant", 1.0f);
+    reflectShader.setFloat("light.linear", 0.09f);
+    reflectShader.setFloat("light.quadratic", 0.032f);
 
     //render the triangle - can be outside as long as it doesn't exceed texture limit
     glActiveTexture(GL_TEXTURE0);

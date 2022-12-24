@@ -175,7 +175,7 @@
     <Image Include="matrix.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="transformation_notes.txt" />
+    <Text Include="general_notes.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

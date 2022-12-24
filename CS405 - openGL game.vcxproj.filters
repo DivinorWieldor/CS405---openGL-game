@@ -89,7 +89,7 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="transformation_notes.txt">
+    <Text Include="general_notes.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>
