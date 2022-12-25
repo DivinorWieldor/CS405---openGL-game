@@ -4,10 +4,15 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 #include <iostream>
 #include <vector>
+
 #include "shader.h"
+#include "model.h"
 #include "stb_image.h"
 #include "chanCamera.h"
 
@@ -54,12 +59,16 @@ int main(){
     glfwConfigureWindow(window);
     if(!gladSetup()) return -1;
 
+    stbi_set_flip_vertically_on_load(true);//flip loaded texture's on the y-axis (before loading model).
+
     // build and compile our shader program
     Shader ourShader("nReflectiveShader.vs", "nReflectiveShader.fs");
     Shader reflectShader("reflectiveShader.vs", "reflectiveShader.fs");
     Shader flatShader("reflective2.vs", "reflective2.fs");
     Shader lightCubeShader("lightCube.vs", "lightCube.fs");
     Shader skyboxShader("skybox.vs", "skybox.fs");
+
+    //Model ourModel("textures/models/backpack/backpack.obj"); //TODO: THIS PART CAUSES A CRASH - WHY? ASK LA! MODEL LOADING IS EXTREMELY USEFUL AND SHOULD BE IMPLEMENTED!
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     float planeVertices[] = {//plane
