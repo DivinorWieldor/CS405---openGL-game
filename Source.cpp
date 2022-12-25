@@ -401,7 +401,9 @@ int main(){
     //de-allocate resources:
     glDeleteVertexArrays(1, &VAO);
     glDeleteVertexArrays(1, &lightVAO);
+    glDeleteVertexArrays(1, &skyboxVAO);
     glDeleteBuffers(1, &cubeVBO);
+    glDeleteBuffers(1, &skyboxVBO);
     //glDeleteBuffers(1, &EBO);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
