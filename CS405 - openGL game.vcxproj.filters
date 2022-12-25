@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Resource Files\shaders">
+      <UniqueIdentifier>{71d0acc6-14e5-4644-888e-993059e54a03}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -53,28 +56,34 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="nReflectiveShader.vs">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="nReflectiveShader.fs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="reflectiveShader.fs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="reflectiveShader.vs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="lightCube.vs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="lightCube.fs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="reflective2.vs">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="reflective2.fs">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="reflective2.vs">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="lightCube.vs">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="lightCube.fs">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="reflectiveShader.fs">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="reflectiveShader.vs">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="skybox.vs">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="skybox.fs">
+      <Filter>Resource Files\shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

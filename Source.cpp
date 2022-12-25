@@ -6,6 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
+#include <vector>
 #include "shader_s.h"
 #include "stb_image.h"
 #include "chanCamera.h"
@@ -15,6 +16,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 unsigned int loadTexture(const char* path);
+unsigned int loadCubemap(std::vector<std::string> faces);
 void glfwSetup();
 void glfwConfigureWindow(GLFWwindow* window);
 bool gladSetup();
@@ -57,6 +59,7 @@ int main(){
     Shader reflectShader("reflectiveShader.vs", "reflectiveShader.fs");
     Shader flatShader("reflective2.vs", "reflective2.fs");
     Shader lightCubeShader("lightCube.vs", "lightCube.fs");
+    Shader skyboxShader("skybox.vs", "skybox.fs");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     float planeVertices[] = {//plane
@@ -112,10 +115,50 @@ int main(){
         -0.5f,  0.5f,  0.5f,   0.0f, 1.0f, 1.0f,    0.0f, 0.0f,     0.0f,  1.0f,  0.0f,
         -0.5f,  0.5f, -0.5f,   1.0f, 0.0f, 1.0f,    0.0f, 1.0f,     0.0f,  1.0f,  0.0f
     };
-    //unsigned int indices[] = {  // note that we start from 0!
-    //    0, 1, 3,  // first Triangle
-    //    1, 2, 3   // second Triangle
-    //};
+    float skyboxVertices[] = {
+        // positions          
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f
+    };
     glm::vec3 cubePositions[] = {// world space positions of our cubes
         glm::vec3(0.0f,  0.0f,  0.0f),
         glm::vec3(2.0f,  5.0f, -15.0f),
@@ -138,24 +181,43 @@ int main(){
     glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);//copy user defined data to bound buffer
 
     glBindVertexArray(VAO);
-
     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // color attribute
+    glEnableVertexAttribArray(0);// position attribute
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    // texture attribute
+    glEnableVertexAttribArray(1);// color attribute
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-    // normal attribute
+    glEnableVertexAttribArray(2);// texture attribute
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
-    glEnableVertexAttribArray(3);
+    glEnableVertexAttribArray(3);// normal attribute
 
-    // second, configure light's VAO (VBO stays same, vertices are the same for the light object)
+    // skybox VAO
+    unsigned int skyboxVAO, skyboxVBO;
+    glGenVertexArrays(1, &skyboxVAO);
+    glGenBuffers(1, &skyboxVBO);
+    glBindVertexArray(skyboxVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    std::vector<std::string> faces{
+        "textures/skybox/right.jpg",
+        "textures/skybox/left.jpg",
+        "textures/skybox/top.jpg",
+        "textures/skybox/bottom.jpg",
+        "textures/skybox/front.jpg",
+        "textures/skybox/back.jpg"
+    };
+    unsigned int cubemapTexture = loadCubemap(faces);
+
+    skyboxShader.use();
+    skyboxShader.setInt("skybox", 0);
+
+
+    // configure light's VAO (VBO stays same, vertices are the same for the light object)
     unsigned int lightVAO;
     glGenVertexArrays(1, &lightVAO);
     glBindVertexArray(lightVAO);
@@ -181,27 +243,6 @@ int main(){
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
     glEnableVertexAttribArray(3);
 
-    //plane
-    unsigned int PlaneVBO;
-    glGenBuffers(1, &PlaneVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, PlaneVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);//copy user defined data to bound buffer
-    unsigned int planeVAO;
-    glGenVertexArrays(1, &planeVAO);
-    glBindVertexArray(planeVAO);
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    // texture attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-    // normal attribute
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
-    glEnableVertexAttribArray(3);
-
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -212,9 +253,9 @@ int main(){
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     //load textures
-    unsigned int texture1 = loadTexture("container.jpg");
-    unsigned int texture2 = loadTexture("awesomeface.png");
-    unsigned int texture3 = loadTexture("matrix.jpg");
+    unsigned int texture1 = loadTexture("textures/container.jpg");
+    unsigned int texture2 = loadTexture("textures/awesomeface.png");
+    unsigned int texture3 = loadTexture("textures/matrix.jpg");
 
     ourShader.use(); // don't forget to activate the shader before setting uniforms!  
     //glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0); // set it manually
@@ -249,8 +290,7 @@ int main(){
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // render
-        //glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        //glClearColor(0.2f, 0.3f, 0.3f, 1.0f);// background color
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);//clear color and depth buffer
         
@@ -339,26 +379,19 @@ int main(){
         glBindVertexArray(texturedVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        //floor plane
-        flatShader.use();//activate shader
-        flatShader.setVec3("viewPos", camera.Position);
-        flatShader.setVec3("light.position", lightPos);
-
-        flatShader.setVec3("light.ambient", 0.2f, 0.5f, 0.31f);
-        flatShader.setVec3("light.diffuse", 0.2f, 0.5f, 0.31f);
-        flatShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-
-        flatShader.setFloat("material.shininess", 32.0f);
-        flatShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
-        flatShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
-        flatShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-        flatShader.setMat4("projection", projection);
-        flatShader.setMat4("view", view);
-        model = glm::mat4(1.0f);
-        flatShader.setMat4("model", model);
-
-        glBindVertexArray(planeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        // draw skybox as last
+        glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+        skyboxShader.use();
+        view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
+        skyboxShader.setMat4("view", view);
+        skyboxShader.setMat4("projection", projection);
+        // skybox cube
+        glBindVertexArray(skyboxVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+        glDepthFunc(GL_LESS); // set depth function back to default
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         glfwSwapBuffers(window);
@@ -367,10 +400,8 @@ int main(){
 
     //de-allocate resources:
     glDeleteVertexArrays(1, &VAO);
-    glDeleteVertexArrays(1, &planeVAO);
     glDeleteVertexArrays(1, &lightVAO);
     glDeleteBuffers(1, &cubeVBO);
-    glDeleteBuffers(1, &PlaneVBO);
     //glDeleteBuffers(1, &EBO);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
@@ -451,6 +482,32 @@ unsigned int loadTexture(char const* path){
     }
     return textureID;
 }
+unsigned int loadCubemap(std::vector<std::string> faces){
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    int width, height, nrChannels;
+    for(unsigned int i = 0; i < faces.size(); i++){
+        unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+
+        if(data){
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            stbi_image_free(data);
+        }
+        else{
+            std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+            stbi_image_free(data);
+        }
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureID;
+}
 
 void glfwSetup(){//initialize glfw and configure
     glfwInit();
@@ -472,5 +529,6 @@ bool gladSetup(){// glad: load OpenGL function pointers
         return false;
     }
     glEnable(GL_DEPTH_TEST);//enable depth buffer
+    //glEnable(GL_CULL_FACE);
     return true;
 }
