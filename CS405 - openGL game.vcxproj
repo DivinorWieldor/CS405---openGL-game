@@ -155,6 +155,8 @@
     <ClInclude Include="FreeCamera.h" />
     <ClInclude Include="chanCamera.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="model.h" />
+    <ClInclude Include="shader.h" />
     <ClInclude Include="shader_s.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="test.h" />

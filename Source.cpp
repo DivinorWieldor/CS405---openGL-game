@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <vector>
-#include "shader_s.h"
+#include "shader.h"
 #include "stb_image.h"
 #include "chanCamera.h"
 
