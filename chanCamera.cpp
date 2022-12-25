@@ -62,5 +62,13 @@ void chanCamera::updateCameraVectors(){
 	glm::quat aroundX = glm::angleAxis(glm::radians(UpAngle), glm::vec3(1, 0, 0));// Pitch
 
 	Orientation = aroundY * aroundX;
+	updateFront();
 }
 
+void chanCamera::updateFront() {
+	float x = 2 * (Orientation.x * Orientation.z + Orientation.w * Orientation.y);
+	float y = 2 * (Orientation.y * Orientation.z - Orientation.w * Orientation.x);
+	float z = 1 - 2 * (Orientation.x * Orientation.x + Orientation.y * Orientation.y);
+
+	Front = glm::vec3(x,y,z);
+}

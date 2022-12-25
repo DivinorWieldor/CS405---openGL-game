@@ -8,7 +8,7 @@
 #include <iostream>
 #include "shader_s.h"
 #include "stb_image.h"
-#include "chanCamera.h"
+#include "FlyCamera.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -24,8 +24,8 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 // camera
-//Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));//FlyCamera
-chanCamera camera(glm::vec3(0.0f, 0.0f, 3.0f));//chanCamera
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));//FlyCamera
+//chanCamera camera(glm::vec3(0.0f, 0.0f, 3.0f));//chanCamera
 //Camera camera(1.0f, SCR_WIDTH, SCR_HEIGHT, 0.1f, 100.0f, glm::vec3(0.0f, 0.0f, 3.0f));//FreeCamera
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;

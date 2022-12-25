@@ -21,6 +21,7 @@ const float ZOOM = 45.0f;
 class chanCamera{
 public:
 	glm::vec3 Position;
+	glm::vec3 Front;
 	glm::quat Orientation;
 	float RightAngle;
 	float UpAngle;
@@ -40,5 +41,6 @@ public:
 
 private:
 	void updateCameraVectors();
+	void updateFront();
 };
 #endif
