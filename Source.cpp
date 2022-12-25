@@ -8,7 +8,7 @@
 #include <iostream>
 #include "shader_s.h"
 #include "stb_image.h"
-#include "FlyCamera.h"
+#include "chanCamera.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -24,8 +24,8 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));//FlyCamera
-//chanCamera camera(glm::vec3(0.0f, 0.0f, 3.0f));//chanCamera
+//Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));//FlyCamera
+chanCamera camera(glm::vec3(0.0f, 0.0f, 3.0f));//chanCamera
 //Camera camera(1.0f, SCR_WIDTH, SCR_HEIGHT, 0.1f, 100.0f, glm::vec3(0.0f, 0.0f, 3.0f));//FreeCamera
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
@@ -225,9 +225,6 @@ int main(){
     reflectShader.setInt("material.diffuse", 0);
     reflectShader.setInt("material.specular", 1);
     reflectShader.setInt("material.emission", 2);
-    reflectShader.setFloat("light.constant", 1.0f);
-    reflectShader.setFloat("light.linear", 0.09f);
-    reflectShader.setFloat("light.quadratic", 0.032f);
 
     //render the triangle - can be outside as long as it doesn't exceed texture limit
     glActiveTexture(GL_TEXTURE0);
@@ -266,11 +263,31 @@ int main(){
 
         reflectShader.use();
         reflectShader.setVec3("viewPos", camera.Position);
-        reflectShader.setVec3("light.position", lightPos);
-        reflectShader.setVec3("light.ambient", ambientColor);
-        reflectShader.setVec3("light.diffuse", diffuseColor);
-        reflectShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
         reflectShader.setFloat("material.shininess", 32.0f);
+        // directional light
+        reflectShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+        reflectShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+        reflectShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+        reflectShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+        // point light 1
+        reflectShader.setVec3("pointLights[0].position", lightPos);
+        reflectShader.setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
+        reflectShader.setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
+        reflectShader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+        reflectShader.setFloat("pointLights[0].constant", 1.0f);
+        reflectShader.setFloat("pointLights[0].linear", 0.09f);
+        reflectShader.setFloat("pointLights[0].quadratic", 0.032f);
+        // spotLight
+        reflectShader.setVec3("spotLight.position", camera.Position);
+        reflectShader.setVec3("spotLight.direction", camera.Front);
+        reflectShader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
+        reflectShader.setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
+        reflectShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
+        reflectShader.setFloat("spotLight.constant", 1.0f);
+        reflectShader.setFloat("spotLight.linear", 0.09f);
+        reflectShader.setFloat("spotLight.quadratic", 0.032f);
+        reflectShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+        reflectShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
 
         // projection transformation
         projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 500.0f);

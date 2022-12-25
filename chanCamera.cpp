@@ -29,7 +29,6 @@ glm::mat4 chanCamera::GetViewMatrix(){
 void chanCamera::ProcessKeyboard(Camera_Movement direction, float deltaTime){
 	float velocity = MovementSpeed * deltaTime;
 	glm::quat qF = Orientation * glm::quat(0, 0, 0, -1) * glm::conjugate(Orientation);
-	glm::vec3 Front = { qF.x, qF.y, qF.z };
 	glm::vec3 Right = glm::normalize(glm::cross(Front, glm::vec3(0, 1, 0)));
 
 	if (direction == Camera_Movement::FORWARD)
@@ -66,9 +65,7 @@ void chanCamera::updateCameraVectors(){
 }
 
 void chanCamera::updateFront() {
-	float x = 2 * (Orientation.x * Orientation.z + Orientation.w * Orientation.y);
-	float y = 2 * (Orientation.y * Orientation.z - Orientation.w * Orientation.x);
-	float z = 1 - 2 * (Orientation.x * Orientation.x + Orientation.y * Orientation.y);
+	glm::quat qF = Orientation * glm::quat(0, 0, 0, -1) * glm::conjugate(Orientation);
 
-	Front = glm::vec3(x,y,z);
+	Front = { qF.x, qF.y, qF.z };
 }
