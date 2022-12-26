@@ -68,13 +68,14 @@ void main(){
         result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);    
     result += CalcSpotLight(spotLight, norm, FragPos, viewDir);// phase 3: spot light
 
-            
     FragColor = vec4(result, 1.0);
+    //FragColor.rgb = pow(FragColor.rgb, vec3(1.0/2.2));//gamma correction - gamma = 2.2
 }
 
 //----------------------------------------------------------- Lighting Functions ----------------------------------------------------------------------
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir){//directional light
     vec3 lightDir = normalize(-light.direction);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
 
     return (light.ambient * vec3(texture(material.diffuse, TexCoords)) +
             light.diffuse * max(dot(normal, lightDir), 0.0) * vec3(texture(material.diffuse, TexCoords)) +
@@ -83,6 +84,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir){//directional light
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir){//point light
     vec3 lightDir = normalize(light.position - fragPos);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
     
     float distance = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));// attenuation
@@ -94,6 +96,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir){/
 
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir){//spot light
     vec3 lightDir = normalize(light.position - fragPos);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
     
     float distance = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));// attenuation
