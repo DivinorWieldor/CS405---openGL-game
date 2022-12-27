@@ -1,10 +1,11 @@
 ﻿  Source.cpp
-C:\Users\necagiltay\source\repos\CS405 - openGL game\CS405 - openGL game\Source.cpp(327,35): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\necagiltay\source\repos\CS405 - openGL game\CS405 - openGL game\Source.cpp(413,39): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\necagiltay\source\repos\CS405 - openGL game\CS405 - openGL game\Source.cpp(325,35): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\necagiltay\source\repos\CS405 - openGL game\CS405 - openGL game\Source.cpp(356,39): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\necagiltay\source\repos\CS405 - openGL game\CS405 - openGL game\Source.cpp(423,39): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 LINK : warning LNK4098: defaultlib 'MSVCRTD' conflicts with use of other libs; use /NODEFAULTLIB:library
   Generating code
-  0 of 525 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+  4 of 531 functions ( 0.8%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+    8 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   CS405 - openGL game.vcxproj -> C:\Users\necagiltay\source\repos\CS405 - openGL game\x64\Release\CS405 - openGL game.exe

@@ -48,7 +48,7 @@ in VS_OUT {
     vec3 FragPos;
     vec3 Normal;
     vec2 TexCoords;
-    //vec4 FragPosLightSpace;
+    vec4 FragPosLightSpace;
 } fs_in;
 
 uniform Material material;
@@ -60,9 +60,9 @@ uniform SpotLight spotLight;
 uniform sampler2D shadowMap;
 
 // function prototypes
-vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
-vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
-vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, float shadow);
+vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, float shadow);
+vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, float shadow);
 
 void main(){
     vec3 color = texture(material.diffuse, fs_in.TexCoords).rgb;
@@ -70,18 +70,18 @@ void main(){
     vec3 viewDir = normalize(viewPos - fs_in.FragPos);
     vec3 lightColor = vec3(0.3);
 
-    //float shadow = ShadowCalculation(fs_in.FragPosLightSpace);
-    vec3 result = CalcDirLight(dirLight, norm, viewDir);//directional light
+    float shadow = ShadowCalculation(fs_in.FragPosLightSpace);
+    vec3 result = CalcDirLight(dirLight, norm, viewDir, shadow);//directional light
     for(int i = 0; i < NR_POINT_LIGHTS; i++)// phase 2: point lights
-        result += CalcPointLight(pointLights[i], norm, fs_in.FragPos, viewDir);    
-    result += CalcSpotLight(spotLight, norm, fs_in.FragPos, viewDir);// phase 3: spot light
+        result += CalcPointLight(pointLights[i], norm, fs_in.FragPos, viewDir, shadow);    
+    result += CalcSpotLight(spotLight, norm, fs_in.FragPos, viewDir, shadow);// phase 3: spot light
 
     FragColor = vec4(result, 1.0);
     //FragColor.rgb = pow(FragColor.rgb, vec3(1.0/2.2));//gamma correction - gamma = 2.2
 }
 
 //----------------------------------------------------------- Lighting Functions ----------------------------------------------------------------------
-vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir){//directional light
+vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, float shadow){//directional light
     vec3 lightDir = normalize(-light.direction);
     vec3 halfwayDir = normalize(lightDir + viewDir);
 
@@ -90,7 +90,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir){//directional light
              light.specular * pow(max(dot(viewDir, reflect(-lightDir, normal)), 0.0), material.shininess) * vec3(texture(material.specular, fs_in.TexCoords)));
 }
 
-vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir){//point light
+vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, float shadow){//point light
     vec3 lightDir = normalize(light.position - fragPos);
     vec3 halfwayDir = normalize(lightDir + viewDir);
     
@@ -102,7 +102,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir){/
              light.specular * pow(max(dot(viewDir, reflect(-lightDir, normal)), 0.0), material.shininess) * vec3(texture(material.specular, fs_in.TexCoords)) * attenuation);
 }
 
-vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir){//spot light
+vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, float shadow){//spot light
     vec3 lightDir = normalize(light.position - fragPos);
     vec3 halfwayDir = normalize(lightDir + viewDir);
     
