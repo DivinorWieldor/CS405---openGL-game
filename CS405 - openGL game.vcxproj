@@ -169,6 +169,8 @@
     <None Include="reflectiveShader.vs" />
     <None Include="nReflectiveShader.fs" />
     <None Include="nReflectiveShader.vs" />
+    <None Include="shadow_mapping_depth.fs" />
+    <None Include="shadow_mapping_depth.vs" />
     <None Include="skybox.fs" />
     <None Include="skybox.vs" />
   </ItemGroup>
