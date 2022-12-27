@@ -311,7 +311,7 @@ int main(){
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, depthMap);
     
-    // world, camera/view, screen projection transformations
+    // world,        camera/view, screen projection transformations
     glm::mat4 model, view, projection, transform;
     glm::vec3 lightColor, diffuseColor, ambientColor;
     float currentFrame;
