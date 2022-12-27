@@ -161,6 +161,8 @@
     <ClInclude Include="test.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="debug_quad.vs" />
+    <None Include="debug_quad_depth.fs" />
     <None Include="lightCube.fs" />
     <None Include="lightCube.vs" />
     <None Include="reflective2.fs" />

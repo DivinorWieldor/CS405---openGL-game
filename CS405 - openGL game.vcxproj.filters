@@ -94,6 +94,12 @@
     <None Include="shadow_mapping_depth.fs">
       <Filter>Resource Files\shaders</Filter>
     </None>
+    <None Include="debug_quad.vs">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="debug_quad_depth.fs">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="container.jpg">

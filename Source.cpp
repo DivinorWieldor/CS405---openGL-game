@@ -27,6 +27,7 @@ void glfwConfigureWindow(GLFWwindow* window);
 bool gladSetup();
 //void renderScene(const Shader& shader, unsigned int& VAO);
 //void renderCube();
+void renderQuad();
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -73,6 +74,7 @@ int main(){
     Shader lightCubeShader("lightCube.vs", "lightCube.fs");
     Shader skyboxShader("skybox.vs", "skybox.fs");
     Shader simpleDepthShader("shadow_mapping_depth.vs", "shadow_mapping_depth.fs");
+    Shader debugDepthQuad("debug_quad.vs", "debug_quad_depth.fs");
 
     //Model ourModel("textures/models/backpack/backpack.obj"); //TODO: THIS PART CAUSES A CRASH - WHY? ASK LA! MODEL LOADING IS EXTREMELY USEFUL AND SHOULD BE IMPLEMENTED!
 
@@ -310,6 +312,9 @@ int main(){
     glBindTexture(GL_TEXTURE_2D, texture3);// bind emission map
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, depthMap);
+
+    debugDepthQuad.use();
+    debugDepthQuad.setInt("depthMap", 0);
     
     // world, camera/view, screen projection transformations
     glm::mat4 model, view, projection, transform;
@@ -355,12 +360,14 @@ int main(){
             if (i % 3 == 0)  //every 3rd cube, we set the angle using time function
                 angle = glfwGetTime() * 25.0f;
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            reflectShader.setMat4("model", model);
+            simpleDepthShader.setMat4("model", model);
 
+            glBindVertexArray(VAO);
             glDrawArrays(GL_TRIANGLES, 0, 36);
+            glBindVertexArray(0);
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // reset viewport
         glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -409,6 +416,14 @@ int main(){
         reflectShader.setFloat("spotLight.quadratic", 0.032f);
         reflectShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
         reflectShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture1);// bind diffuse map
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);// bind specular map
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, texture3);// bind emission map
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
 
         // create transformations - make sure to initialize matrix to identity matrix first
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, -0.5f, 0.0f));
@@ -466,6 +481,15 @@ int main(){
         glBindVertexArray(0);
         glDepthFunc(GL_LESS); // set depth function back to default
 
+        // render Depth map to quad for visual debugging
+        // ---------------------------------------------
+        debugDepthQuad.use();
+        debugDepthQuad.setFloat("near_plane", near_plane);
+        debugDepthQuad.setFloat("far_plane", far_plane);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+        renderQuad();
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -482,6 +506,37 @@ int main(){
     // glfw: terminate, clearing all previously allocated GLFW resources.
     glfwTerminate();
     return 0;
+}
+
+// renderQuad() renders a 1x1 XY quad in NDC
+// -----------------------------------------
+unsigned int quadVAO = 0;
+unsigned int quadVBO;
+void renderQuad()
+{
+    if (quadVAO == 0)
+    {
+        float quadVertices[] = {
+            // positions        // texture Coords
+            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        };
+        // setup plane VAO
+        glGenVertexArrays(1, &quadVAO);
+        glGenBuffers(1, &quadVBO);
+        glBindVertexArray(quadVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    }
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
