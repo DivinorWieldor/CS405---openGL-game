@@ -64,13 +64,32 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, float shadow);
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, float shadow);
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, float shadow);
 
+
 float ShadowCalculation(vec4 fragPosLightSpace){
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;// perform perspective divide
     projCoords = projCoords * 0.5 + 0.5;// transform to [0,1] range
-    float closestDepth = texture(shadowMap, projCoords.xy).r;// get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(shadowMap, projCoords.xy).r; // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
     float currentDepth = projCoords.z;// get depth of current fragment from light's perspective
-    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;// check whether current frag pos is in shadow
-
+    vec3 normal = normalize(fs_in.Normal);// calculate bias (based on depth map resolution and slope)
+    //vec3 lightDir = normalize(pointLights[0].position - fs_in.FragPos);
+    float bias = max(0.05 * (1.0 - dot(normal, normalize(dirLight.direction))), 0.005);
+    // check whether current frag pos is in shadow
+    // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
+    // PCF
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+    for(int x = -1; x <= 1; ++x){
+        for(int y = -1; y <= 1; ++y){
+            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
+            shadow += (currentDepth - bias) > pcfDepth  ? 1.0 : 0.0;        
+        }    
+    }
+    shadow /= 9.0;
+    
+    // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
+    if(projCoords.z > 1.0)
+        shadow = 0.0;
+        
     return shadow;
 }
 
@@ -85,7 +104,6 @@ void main(){
     for(int i = 0; i < NR_POINT_LIGHTS; i++)// phase 2: point lights
         result += CalcPointLight(pointLights[i], norm, fs_in.FragPos, viewDir, shadow);    
     result += CalcSpotLight(spotLight, norm, fs_in.FragPos, viewDir, shadow);// phase 3: spot light
-    
 
     FragColor = vec4(result, 1.0);
     //FragColor.rgb = pow(FragColor.rgb, vec3(1.0/2.2));//gamma correction - gamma = 2.2

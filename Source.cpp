@@ -4,15 +4,15 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+//#include <assimp/Importer.hpp>
+//#include <assimp/scene.h>
+//#include <assimp/postprocess.h>
 
 #include <iostream>
 #include <vector>
 
 #include "shader.h"
-#include "model.h"
+//#include "model.h"
 #include "stb_image.h"
 #include "chanCamera.h"
 
@@ -68,14 +68,14 @@ int main(){
     stbi_set_flip_vertically_on_load(true);//flip loaded texture's on the y-axis (before loading model).
 
     // build and compile our shader program
-    Shader ourShader("nReflectiveShader.vs", "nReflectiveShader.fs");
+    //Shader ourShader("nReflectiveShader.vs", "nReflectiveShader.fs");
     Shader reflectShader("reflectiveShader.vs", "reflectiveShader.fs");
-    Shader flatShader("reflective2.vs", "reflective2.fs");
+    //Shader flatShader("reflective2.vs", "reflective2.fs");
     Shader lightCubeShader("lightCube.vs", "lightCube.fs");
     Shader skyboxShader("skybox.vs", "skybox.fs");
     Shader simpleDepthShader("shadow_mapping_depth.vs", "shadow_mapping_depth.fs");
     Shader debugDepthQuad("debug_quad.vs", "debug_quad_depth.fs");
-
+    glEnable(GL_DEPTH_TEST);
     //Model ourModel("textures/models/backpack/backpack.obj"); //TODO: THIS PART CAUSES A CRASH - WHY? ASK LA! MODEL LOADING IS EXTREMELY USEFUL AND SHOULD BE IMPLEMENTED!
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -293,10 +293,10 @@ int main(){
 
     // shader configuration
     // ------------------------------------------------------------
-    ourShader.use(); // don't forget to activate the shader before setting uniforms!  
-    //glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0); // set it manually
-    ourShader.setInt("texture1", 0);// or with shader class
-    ourShader.setInt("texture2", 1);
+    //ourShader.use(); // don't forget to activate the shader before setting uniforms!  
+    ////glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0); // set it manually
+    //ourShader.setInt("texture1", 0);// or with shader class
+    //ourShader.setInt("texture2", 1);
 
     reflectShader.use();
     reflectShader.setInt("material.diffuse", 0);
@@ -398,7 +398,7 @@ int main(){
         reflectShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
         // point light 1
         reflectShader.setVec3("pointLights[0].position", lightPos);
-        //reflectShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+        reflectShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
         reflectShader.setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
         reflectShader.setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
         reflectShader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
@@ -455,17 +455,17 @@ int main(){
         glBindVertexArray(lightVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        //textured cube
-        ourShader.use();//activate shader
-        ourShader.setMat4("projection", projection);
-        ourShader.setMat4("view", view);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, texturedPos);
-        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
-        ourShader.setMat4("model", model);
+        ////textured cube ------ not used in final product, just demonstrates the object only having textures
+        //ourShader.use();//activate shader
+        //ourShader.setMat4("projection", projection);
+        //ourShader.setMat4("view", view);
+        //model = glm::mat4(1.0f);
+        //model = glm::translate(model, texturedPos);
+        //model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+        //ourShader.setMat4("model", model);
 
-        glBindVertexArray(texturedVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        //glBindVertexArray(texturedVAO);
+        //glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // draw skybox as last
         glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
@@ -488,7 +488,7 @@ int main(){
         debugDepthQuad.setFloat("far_plane", far_plane);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, depthMap);
-        renderQuad();
+        //renderQuad();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         glfwSwapBuffers(window);
@@ -524,7 +524,9 @@ void renderQuad()
              1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
         };
         // setup plane VAO
+        //glEnable(GL_CULL_FACE);
         glGenVertexArrays(1, &quadVAO);
+        std::cout << "QUAD_VAO is as following:\n " << quadVAO;
         glGenBuffers(1, &quadVBO);
         glBindVertexArray(quadVAO);
         glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
