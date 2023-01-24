@@ -30,6 +30,7 @@ void chanCamera::ProcessKeyboard(Camera_Movement direction, float deltaTime){
 	float velocity = MovementSpeed * deltaTime;
 	glm::quat qF = Orientation * glm::quat(0, 0, 0, -1) * glm::conjugate(Orientation);
 	glm::vec3 Right = glm::normalize(glm::cross(Front, glm::vec3(0, 1, 0)));
+	lastPos = Position;
 
 	if (direction == Camera_Movement::FORWARD)
 		Position += Front * velocity;
@@ -39,6 +40,10 @@ void chanCamera::ProcessKeyboard(Camera_Movement direction, float deltaTime){
 		Position -= Right * velocity;
 	if (direction == Camera_Movement::RIGHT)
 		Position += Right * velocity;
+}
+
+void chanCamera::RevertPos(bool isColliding){
+	if(isColliding)	Position = lastPos;
 }
 
 void chanCamera::ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch){

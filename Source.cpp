@@ -25,8 +25,7 @@ unsigned int loadCubemap(std::vector<std::string> faces);
 void glfwSetup();
 void glfwConfigureWindow(GLFWwindow* window);
 bool gladSetup();
-//void renderScene(const Shader& shader, unsigned int& VAO);
-//void renderCube();
+bool CheckCollision(chanCamera cam, glm::vec3 cubePos);
 void renderQuad();
 
 // settings
@@ -325,6 +324,11 @@ int main(){
     // render loop
     while(!glfwWindowShouldClose(window)){
         processInput(window);// input
+        for (unsigned int i = 0; i < 10; i++) {
+            if (CheckCollision(camera, cubePositions[i])) {//Do collision logic here, since the only objects in our scene is these cubes
+                camera.RevertPos(true);
+            }
+        }
 
         //per-frame time calculation
         currentFrame = glfwGetTime();
@@ -663,4 +667,18 @@ bool gladSetup(){// glad: load OpenGL function pointers
     glEnable(GL_DEPTH_TEST);//enable depth buffer
     //glEnable(GL_CULL_FACE);
     return true;
+}
+
+bool CheckCollision(chanCamera cam, glm::vec3 cubePos){ // AABB - AABB collision
+    // collision x-axis?
+    bool collisionX = cam.Position.x + 0.5 >= cubePos.x &&
+        cubePos.x + 1 >= cam.Position.x;
+    // collision y-axis?
+    bool collisionY = cam.Position.y + 0.5 >= cubePos.y &&
+        cubePos.y + 1 >= cam.Position.y;
+    // collision z-axis?
+    bool collisionZ = cam.Position.z + 0.5 >= cubePos.z &&
+        cubePos.z + 1 >= cam.Position.z;
+    // collision only if on all axes
+    return collisionX && collisionY && collisionZ;
 }

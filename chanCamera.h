@@ -36,10 +36,12 @@ public:
 
 	glm::mat4 GetViewMatrix();
 	void ProcessKeyboard(Camera_Movement direction, float deltaTime);
+	void RevertPos(bool isColliding);
 	void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
 	void ProcessMouseScroll(float yoffset);
 
 private:
+	glm::vec3 lastPos;
 	void updateCameraVectors();
 	void updateFront();
 };
